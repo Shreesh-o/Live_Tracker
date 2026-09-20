@@ -1,3 +1,4 @@
+import json 
 import os
 
 from dotenv import load_dotenv
@@ -34,9 +35,14 @@ try:
             print(f"❌ Consumer error: {message.error()}")
             continue
 
+        data = json.loads(message.value().decode('utf-8'))
+
         print(
-            f"📩 Received: {message.value().decode('utf-8')}"
+            f"📈 {data['symbol']} | "
+            f"${data['price']:,.2f} {data['currency']} | "
+            f"{data['timestamp']}"
         )
+        
 except KeyboardInterrupt:
     print('\n Stopping Consumer....')
 
