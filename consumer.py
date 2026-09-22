@@ -22,7 +22,7 @@ topic = os.getenv('KAFKA_TOPIC')
 
 consumer.subscribe([topic])
 
-print(f'Listening to topic: {topic}')
+print(f"📡 Consumer started | PID: {os.getpid()} | Topic: {topic}")
 
 try:
     while True:
@@ -38,9 +38,11 @@ try:
         data = json.loads(message.value().decode('utf-8'))
 
         print(
-            f"📈 {data['symbol']} | "
+            f"📈 PID {os.getpid()} | "
+            f"{data['symbol']} | "
             f"${data['price']:,.2f} {data['currency']} | "
-            f"{data['timestamp']}"
+            f"partition={message.partition()} | "
+            f"offset={message.offset()}"
         )
         
 except KeyboardInterrupt:

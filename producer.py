@@ -26,7 +26,7 @@ def delivery_report(err, message):
         print(f'❌ Delivery failed: {err}')
     else:
         print(
-            f"✅ Sent BTC price to "
+            f"✅ Sent {message.key().decode()} price to "
             f"{message.topic()} [{message.partition()}]"
         )
 
@@ -35,7 +35,7 @@ while True:
         response = requests.get(
             "https://api.coingecko.com/api/v3/simple/price",
             params={
-                "ids": "bitcoin",
+                "ids": "bitcoin,ethereum,solana",
                 "vs_currencies": "usd",
             },
             timeout=10,
@@ -45,29 +45,39 @@ while True:
 
         data = response.json()
 
-        price = data['bitcoin']['usd']
+        timestamp = datetime.now(timezone.utc).isoformat()
 
-        price_event = {
-            "symbol": "BTC",
-            "price": price,
-            "currency": "USD",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+        coins = {
+            'bitcoin':'BTC',
+            'ethereum':'ETH',
+            'solana':'SOL',
         }
 
-        message = json.dumps(price_event)
+        for coin_id,symbol in coins.items():
+            price = data[coin_id]['usd']
 
-        producer.produce(
-            topic=topic,
-            key='BTC',
-            value=message,
-            callback=delivery_report,
-        )
+            price_event = {
+                "symbol": symbol,
+                "price": price,
+                "currency": "USD",
+                "timestamp": timestamp,
+            }
+
+            message = json.dumps(price_event)
+
+            producer.produce(
+                topic=topic,
+                key=symbol,
+                value=message,
+                callback=delivery_report,
+            )
 
         producer.flush()
 
-        print(f"📈 BTC: ${price}")
+        for coin_id, symbol in coins.items():
+            print(f"📈 {symbol}: ${data[coin_id]['usd']:,.2f}")
 
-        time.sleep(5)
+        time.sleep(30)
 
     except Exception as e:
         print(f"❌ Error: {e}")
