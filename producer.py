@@ -23,11 +23,12 @@ topic = os.getenv('KAFKA_TOPIC')
 
 def delivery_report(err, message):
     if err is not None:
-        print(f'❌ Delivery failed: {err}')
+        print(f"❌ Delivery failed: {err}")
     else:
         print(
-            f"✅ Sent {message.key().decode()} price to "
-            f"{message.topic()} [{message.partition()}]"
+            f"✅ Sent {message.key().decode()} "
+            f"to {message.topic()} "
+            f"[partition={message.partition()}]"
         )
 
 while True:
@@ -35,7 +36,7 @@ while True:
         response = requests.get(
             "https://api.coingecko.com/api/v3/simple/price",
             params={
-                "ids": "bitcoin,ethereum,solana",
+                "ids": "bitcoin,ethereum,solana,dogecoin,ripple,cardano,avalanche-2,chainlink",
                 "vs_currencies": "usd",
             },
             timeout=10,
@@ -48,9 +49,14 @@ while True:
         timestamp = datetime.now(timezone.utc).isoformat()
 
         coins = {
-            'bitcoin':'BTC',
-            'ethereum':'ETH',
-            'solana':'SOL',
+            "bitcoin": "BTC",
+            "ethereum": "ETH",
+            "solana": "SOL",
+            "dogecoin": "DOGE",
+            "ripple": "XRP",
+            "cardano": "ADA",
+            "avalanche-2": "AVAX",
+            "chainlink": "LINK",
         }
 
         for coin_id,symbol in coins.items():
