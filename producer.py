@@ -15,6 +15,10 @@ config = {
     'sasl.mechanisms':'PLAIN',
     'sasl.username':os.getenv('KAFKA_API_KEY'),
     'sasl.password':os.getenv('KAFKA_API_SECRET'),
+
+    'acks':'all',
+    'retries':5,
+    'enable.idempotence':True,
 }
 
 producer = Producer(config)

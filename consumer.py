@@ -14,6 +14,7 @@ config = {
     'sasl.password':os.getenv('KAFKA_API_SECRET'),
     'group.id':'live-price-consumer',
     'auto.offset.reset':'earliest',
+    "enable.auto.commit": False,
 }   
 
 consumer = Consumer(config)
@@ -44,7 +45,9 @@ try:
             f"partition={message.partition()} | "
             f"offset={message.offset()}"
         )
-        
+
+        consumer.commit(message=message)
+
 except KeyboardInterrupt:
     print('\n Stopping Consumer....')
 
